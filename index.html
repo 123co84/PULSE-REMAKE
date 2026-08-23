@@ -1,0 +1,3069 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>PULSE</title>
+
+<!-- PULSE FAVICON -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2305080a'/%3E%3Ccircle cx='50' cy='50' r='34' fill='none' stroke='%238ea9b5' stroke-width='2' opacity='.5'/%3E%3Cpath d='M17 51h18l6-18 10 36 7-18h25' fill='none' stroke='%23d9654b' stroke-width='4' stroke-linecap='square'/%3E%3Ccircle cx='50' cy='50' r='3' fill='%23d9654b'/%3E%3C/svg%3E">
+
+<style>
+
+:root{
+--black:#050709;
+--deep:#080c0f;
+--panel:#0b1014;
+--panel2:#10171c;
+--text:#d8dfe2;
+--muted:#68747b;
+--blue:#91abb7;
+--red:#b84444;
+--orange:#d86b4d;
+--line:rgba(145,171,183,.17);
+--glow:rgba(145,171,183,.14);
+}
+
+*{
+box-sizing:border-box;
+}
+
+html,body{
+margin:0;
+width:100%;
+height:100%;
+overflow:hidden;
+background:var(--black);
+color:var(--text);
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+cursor:crosshair;
+}
+
+/* ================================
+INTRO
+================================ */
+
+#intro{
+position:fixed;
+inset:0;
+z-index:99999;
+background:#020304;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+transition:1.2s;
+}
+
+#intro.hide{
+opacity:0;
+pointer-events:none;
+}
+
+.introPulse{
+width:280px;
+height:1px;
+background:var(--red);
+box-shadow:0 0 30px var(--red);
+animation:introPulse 1.5s infinite;
+}
+
+@keyframes introPulse{
+0%,100%{transform:scaleX(.15);opacity:.3}
+50%{transform:scaleX(1);opacity:1}
+}
+
+.introTitle{
+font-size:clamp(70px,13vw,170px);
+font-weight:200;
+letter-spacing:-.08em;
+margin-top:35px;
+}
+
+.introText{
+font-size:8px;
+letter-spacing:.5em;
+color:var(--muted);
+margin-top:15px;
+}
+
+.enter{
+margin-top:55px;
+background:none;
+border:1px solid var(--blue);
+color:var(--blue);
+padding:13px 35px;
+font-size:9px;
+letter-spacing:.25em;
+cursor:pointer;
+transition:.3s;
+}
+
+.enter:hover{
+background:var(--blue);
+color:#020304;
+}
+
+/* ================================
+WORLD
+================================ */
+
+#world{
+position:fixed;
+inset:0;
+overflow:hidden;
+background:
+radial-gradient(
+circle at 70% 20%,
+rgba(82,113,126,.13),
+transparent 30%
+),
+linear-gradient(#080b0e,#030506);
+transition:filter .6s;
+}
+
+#world.fog{
+filter:blur(.5px);
+}
+
+#world.red{
+background:
+radial-gradient(
+circle at 65% 30%,
+rgba(170,50,50,.18),
+transparent 30%
+),
+#050506;
+}
+
+.noise{
+position:absolute;
+inset:-30%;
+z-index:1000;
+pointer-events:none;
+opacity:.025;
+background-image:
+radial-gradient(circle,#fff 1px,transparent 1px);
+background-size:5px 5px;
+animation:noiseMove .15s steps(2) infinite;
+}
+
+@keyframes noiseMove{
+0%{transform:translate(0,0)}
+50%{transform:translate(2%,1%)}
+100%{transform:translate(-1%,2%)}
+}
+
+/* ================================
+HEADER
+================================ */
+
+header{
+position:absolute;
+top:0;
+left:0;
+right:0;
+height:65px;
+z-index:300;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 24px;
+border-bottom:1px solid var(--line);
+background:rgba(3,5,7,.55);
+backdrop-filter:blur(8px);
+}
+
+.logo{
+font-size:16px;
+letter-spacing:.3em;
+}
+
+.headerRight{
+display:flex;
+align-items:center;
+gap:18px;
+font-size:8px;
+letter-spacing:.12em;
+color:var(--muted);
+}
+
+.live{
+color:var(--blue);
+}
+
+#clock{
+font-variant-numeric:tabular-nums;
+}
+
+/* ================================
+NAV
+================================ */
+
+nav{
+position:absolute;
+top:95px;
+left:25px;
+z-index:400;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+nav button{
+background:none;
+border:0;
+padding:0;
+color:var(--muted);
+font-size:8px;
+letter-spacing:.23em;
+cursor:pointer;
+text-align:left;
+transition:.2s;
+}
+
+nav button:hover{
+color:var(--text);
+transform:translateX(8px);
+}
+
+nav button.active{
+color:var(--text);
+}
+
+nav button.active:before{
+content:"";
+display:inline-block;
+width:14px;
+height:1px;
+background:var(--red);
+margin-right:7px;
+vertical-align:middle;
+}
+
+/* ================================
+CITY
+================================ */
+
+.city{
+position:absolute;
+top:65px;
+left:0;
+right:0;
+bottom:0;
+overflow:hidden;
+perspective:900px;
+}
+
+.sky{
+position:absolute;
+inset:0;
+background:
+radial-gradient(
+circle at 70% 25%,
+rgba(105,140,154,.1),
+transparent 28%
+);
+}
+
+.skyline{
+position:absolute;
+left:5%;
+right:5%;
+bottom:-5%;
+height:72%;
+display:flex;
+align-items:flex-end;
+justify-content:space-between;
+transform:
+translate(var(--cityX,0px),var(--cityY,0px))
+scale(1.03);
+transition:transform .2s ease-out;
+}
+
+.building{
+position:relative;
+width:9%;
+min-width:40px;
+background:
+linear-gradient(
+90deg,
+#080b0d,
+#11171b,
+#080a0c
+);
+border:1px solid rgba(145,171,183,.08);
+cursor:pointer;
+overflow:hidden;
+transition:.4s;
+}
+
+.building:hover{
+border-color:var(--blue);
+filter:brightness(1.8);
+transform:translateY(-7px);
+}
+
+.building:nth-child(1){height:40%}
+.building:nth-child(2){height:68%}
+.building:nth-child(3){height:53%}
+.building:nth-child(4){height:81%}
+.building:nth-child(5){height:62%}
+.building:nth-child(6){height:73%}
+.building:nth-child(7){height:47%}
+.building:nth-child(8){height:59%}
+.building:nth-child(9){height:34%}
+
+.windows{
+position:absolute;
+inset:10px;
+background-image:
+radial-gradient(
+circle,
+rgba(154,190,202,.55) 1px,
+transparent 2px
+);
+background-size:14px 20px;
+opacity:.15;
+transition:.6s;
+}
+
+.building:hover .windows{
+opacity:.8;
+}
+
+.building.glitchBuilding{
+animation:buildingGlitch .8s steps(2);
+}
+
+@keyframes buildingGlitch{
+0%{transform:translateX(0)}
+25%{transform:translateX(12px)}
+50%{transform:translateX(-8px)}
+75%{transform:translateX(5px)}
+100%{transform:translateX(0)}
+}
+
+.street{
+position:absolute;
+left:10%;
+right:10%;
+bottom:-17%;
+height:42%;
+transform:rotateX(62deg);
+border-top:1px solid rgba(145,171,183,.17);
+background:
+repeating-linear-gradient(
+90deg,
+transparent 0 55px,
+rgba(145,171,183,.06) 56px 57px
+);
+}
+
+.streetLight{
+position:absolute;
+bottom:10%;
+width:2px;
+height:80px;
+background:linear-gradient(
+transparent,
+var(--orange)
+);
+opacity:.25;
+animation:flicker 5s infinite;
+}
+
+.streetLight:nth-child(2){animation-delay:1.4s}
+.streetLight:nth-child(3){animation-delay:3s}
+.streetLight:nth-child(4){animation-delay:4.2s}
+
+@keyframes flicker{
+0%,88%,100%{opacity:.15}
+90%{opacity:.9}
+93%{opacity:.05}
+96%{opacity:.6}
+}
+
+/* ================================
+CITY INFO
+================================ */
+
+.info{
+position:absolute;
+right:30px;
+top:110px;
+z-index:300;
+width:220px;
+font-size:8px;
+letter-spacing:.14em;
+line-height:2.1;
+color:var(--muted);
+}
+
+.info strong{
+color:var(--blue);
+font-weight:normal;
+}
+
+#event{
+margin-top:15px;
+color:var(--red);
+min-height:32px;
+}
+
+/* ================================
+WEATHER
+================================ */
+
+#rain{
+position:absolute;
+inset:0;
+display:none;
+pointer-events:none;
+z-index:250;
+background:
+repeating-linear-gradient(
+105deg,
+transparent 0 15px,
+rgba(150,190,205,.13) 16px,
+transparent 17px
+);
+animation:rain .25s linear infinite;
+}
+
+#rain.active{
+display:block;
+}
+
+@keyframes rain{
+to{
+transform:translateY(18px);
+}
+}
+
+/* ================================
+WINDOWS
+================================ */
+
+.window{
+position:absolute;
+z-index:700;
+width:min(700px,88vw);
+height:min(550px,78vh);
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+display:none;
+background:rgba(8,12,16,.98);
+border:1px solid var(--line);
+box-shadow:0 30px 100px #000;
+}
+
+.window.open{
+display:block;
+animation:windowOpen .25s ease;
+}
+
+@keyframes windowOpen{
+from{
+opacity:0;
+transform:translate(-50%,-50%) scale(.96);
+}
+to{
+opacity:1;
+transform:translate(-50%,-50%) scale(1);
+}
+}
+
+.windowHeader{
+height:40px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 14px;
+border-bottom:1px solid var(--line);
+background:#070a0d;
+font-size:8px;
+letter-spacing:.18em;
+cursor:grab;
+}
+
+.windowHeader:active{
+cursor:grabbing;
+}
+
+.close{
+cursor:pointer;
+color:var(--muted);
+font-size:15px;
+}
+
+.close:hover{
+color:var(--red);
+}
+
+.windowBody{
+height:calc(100% - 40px);
+overflow:auto;
+padding:25px;
+}
+
+/* ================================
+PHONE
+================================ */
+
+.phoneGrid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+}
+
+.app{
+aspect-ratio:1;
+border:1px solid var(--line);
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+gap:9px;
+cursor:pointer;
+transition:.25s;
+}
+
+.app:hover{
+background:#12191e;
+border-color:var(--blue);
+transform:translateY(-4px);
+}
+
+.icon{
+width:38px;
+height:38px;
+display:grid;
+place-items:center;
+border:1px solid var(--blue);
+color:var(--blue);
+font-size:15px;
+}
+
+.app span{
+font-size:7px;
+letter-spacing:.15em;
+color:var(--muted);
+}
+
+#phoneContent{
+margin-top:25px;
+}
+
+/* ================================
+FEED
+================================ */
+
+.feed{
+display:flex;
+flex-direction:column;
+gap:1px;
+}
+
+.post{
+background:#0d1216;
+border:1px solid var(--line);
+padding:18px;
+}
+
+.postHeader{
+font-size:8px;
+color:var(--blue);
+letter-spacing:.14em;
+}
+
+.postText{
+margin-top:12px;
+font-size:11px;
+line-height:1.8;
+}
+
+.fakeImage{
+height:130px;
+margin-top:14px;
+background:
+linear-gradient(
+135deg,
+#111820,
+#20272b,
+#090b0d
+);
+position:relative;
+overflow:hidden;
+}
+
+.fakeImage:after{
+content:"";
+position:absolute;
+inset:-50%;
+background:
+linear-gradient(
+120deg,
+transparent 40%,
+rgba(145,171,183,.15),
+transparent 60%
+);
+transform:rotate(20deg);
+animation:imageScan 4s linear infinite;
+}
+
+@keyframes imageScan{
+to{transform:translateX(80%) rotate(20deg)}
+}
+
+/* ================================
+MAP
+================================ */
+
+.map{
+height:390px;
+position:relative;
+overflow:hidden;
+border:1px solid var(--line);
+background:
+linear-gradient(
+90deg,
+transparent 49.5%,
+rgba(145,171,183,.1) 50%,
+transparent 50.5%
+),
+linear-gradient(
+transparent 49.5%,
+rgba(145,171,183,.1) 50%,
+transparent 50.5%
+);
+background-size:90px 90px;
+}
+
+.map:after{
+content:"";
+position:absolute;
+inset:0;
+background:
+linear-gradient(
+45deg,
+transparent 49%,
+rgba(145,171,183,.07) 50%,
+transparent 51%
+);
+background-size:120px 120px;
+}
+
+.mapPoint{
+position:absolute;
+width:12px;
+height:12px;
+border:1px solid var(--blue);
+border-radius:50%;
+z-index:2;
+cursor:pointer;
+transition:.25s;
+}
+
+.mapPoint:hover{
+background:var(--blue);
+box-shadow:0 0 25px var(--blue);
+}
+
+.mapPoint span{
+position:absolute;
+left:20px;
+top:-3px;
+font-size:7px;
+white-space:nowrap;
+color:var(--muted);
+letter-spacing:.12em;
+}
+
+/* ================================
+RADIO
+================================ */
+
+.frequency{
+font-size:60px;
+font-weight:200;
+letter-spacing:-.06em;
+}
+
+.radioBar{
+height:1px;
+margin:20px 0;
+background:linear-gradient(
+90deg,
+var(--red),
+transparent
+);
+}
+
+.radioMessage{
+padding:25px;
+min-height:120px;
+border:1px solid var(--line);
+font-size:11px;
+line-height:2;
+color:var(--muted);
+}
+
+.actions{
+display:flex;
+gap:10px;
+margin-top:20px;
+}
+
+.action{
+background:none;
+border:1px solid var(--blue);
+color:var(--blue);
+padding:10px 16px;
+font-size:8px;
+letter-spacing:.15em;
+cursor:pointer;
+}
+
+.action:hover{
+background:var(--blue);
+color:#050607;
+}
+
+/* ================================
+BROWSER
+================================ */
+
+.browserBar{
+display:flex;
+gap:7px;
+}
+
+.browserInput{
+flex:1;
+background:#050709;
+border:1px solid var(--line);
+padding:11px;
+color:var(--text);
+outline:none;
+font-family:monospace;
+}
+
+.browserPage{
+margin-top:15px;
+min-height:340px;
+border:1px solid var(--line);
+padding:30px;
+font-family:monospace;
+font-size:10px;
+line-height:2;
+color:var(--muted);
+}
+
+.browserPage h1{
+font-size:35px;
+font-weight:300;
+color:var(--text);
+}
+
+/* ================================
+FILESYSTEM
+================================ */
+
+.files{
+font-family:monospace;
+font-size:10px;
+line-height:2.3;
+}
+
+.folder{
+padding-left:15px;
+color:var(--muted);
+cursor:pointer;
+}
+
+.folder:hover{
+color:var(--blue);
+}
+
+.file{
+padding-left:35px;
+color:#89959b;
+cursor:pointer;
+}
+
+.file:hover{
+color:var(--text);
+}
+
+/* ================================
+MUSIC
+================================ */
+
+.musicGrid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px;
+}
+
+.musicCard{
+display:block;
+padding:25px;
+min-height:170px;
+border:1px solid var(--line);
+color:var(--text);
+text-decoration:none;
+transition:.3s;
+position:relative;
+overflow:hidden;
+}
+
+.musicCard:hover{
+border-color:var(--red);
+background:#111519;
+transform:translateY(-4px);
+}
+
+.musicNumber{
+font-size:8px;
+color:var(--muted);
+}
+
+.musicName{
+font-size:22px;
+font-weight:300;
+margin-top:40px;
+}
+
+.musicStatus{
+font-size:7px;
+letter-spacing:.16em;
+color:var(--blue);
+margin-top:12px;
+}
+
+.musicCard:after{
+content:"SIGNAL";
+position:absolute;
+right:-25px;
+bottom:12px;
+font-size:55px;
+font-weight:bold;
+color:rgba(145,171,183,.025);
+}
+
+/* ================================
+PORTALS
+================================ */
+
+.portalGrid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+}
+
+.portal{
+border:1px solid var(--line);
+padding:25px;
+min-height:210px;
+text-decoration:none;
+color:var(--text);
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+transition:.3s;
+}
+
+.portal:hover{
+border-color:var(--blue);
+background:#11171b;
+transform:translateY(-5px);
+}
+
+.portal small{
+color:var(--muted);
+font-size:7px;
+letter-spacing:.2em;
+}
+
+.portal h2{
+font-size:27px;
+font-weight:300;
+}
+
+.portal p{
+font-size:8px;
+color:var(--muted);
+line-height:1.7;
+}
+
+/* ================================
+NOTES
+================================ */
+
+.notes{
+width:100%;
+height:260px;
+resize:none;
+background:#06090b;
+border:1px solid var(--line);
+color:var(--text);
+padding:18px;
+outline:none;
+font-family:monospace;
+font-size:10px;
+}
+
+/* ================================
+PULSE ID
+================================ */
+
+.identity{
+border:1px solid var(--line);
+padding:25px;
+font-family:monospace;
+line-height:2.3;
+font-size:10px;
+}
+
+.identityValue{
+color:var(--blue);
+}
+
+/* ================================
+DISCOVERIES
+================================ */
+
+.discoveryGrid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:8px;
+}
+
+.discovery{
+padding:16px 10px;
+border:1px solid var(--line);
+font-size:7px;
+color:var(--muted);
+text-align:center;
+}
+
+.discovery.found{
+color:var(--blue);
+border-color:rgba(145,171,183,.35);
+}
+
+/* ================================
+GLITCH
+================================ */
+
+body.glitch #world{
+animation:glitchWorld .3s steps(2);
+}
+
+@keyframes glitchWorld{
+0%{transform:translate(0)}
+20%{transform:translate(-3px,2px)}
+40%{transform:translate(3px,-1px)}
+60%{transform:translate(-2px,-2px)}
+80%{transform:translate(2px,1px)}
+100%{transform:translate(0)}
+}
+
+/* ================================
+SECRET
+================================ */
+
+#secret{
+position:fixed;
+inset:0;
+z-index:100000;
+display:none;
+align-items:center;
+justify-content:center;
+background:#000;
+text-align:center;
+}
+
+#secret.show{
+display:flex;
+}
+
+.secretBox{
+max-width:500px;
+padding:30px;
+}
+
+.secretBox h1{
+font-size:60px;
+font-weight:200;
+letter-spacing:-.06em;
+}
+
+.secretBox p{
+font-family:monospace;
+font-size:9px;
+line-height:2;
+color:var(--muted);
+}
+
+.secretClose{
+margin-top:30px;
+padding:10px 20px;
+background:none;
+border:1px solid var(--blue);
+color:var(--blue);
+cursor:pointer;
+}
+
+/* ================================
+TOAST
+================================ */
+
+#toast{
+position:fixed;
+left:50%;
+bottom:25px;
+transform:translate(-50%,30px);
+z-index:100001;
+padding:12px 20px;
+background:#080c0f;
+border:1px solid var(--line);
+color:var(--blue);
+font-size:8px;
+letter-spacing:.16em;
+opacity:0;
+pointer-events:none;
+transition:.3s;
+}
+
+#toast.show{
+opacity:1;
+transform:translate(-50%,0);
+}
+
+/* ================================
+MOBILE
+================================ */
+
+@media(max-width:700px){
+
+header{
+padding:0 15px;
+}
+
+.headerRight span:nth-child(2){
+display:none;
+}
+
+nav{
+left:10px;
+right:10px;
+bottom:10px;
+top:auto;
+flex-direction:row;
+flex-wrap:wrap;
+padding:12px;
+background:rgba(5,7,9,.94);
+border:1px solid var(--line);
+}
+
+nav button{
+font-size:7px;
+}
+
+.info{
+right:15px;
+top:90px;
+width:145px;
+font-size:7px;
+}
+
+.window{
+width:94vw;
+height:72vh;
+}
+
+.musicGrid,
+.portalGrid{
+grid-template-columns:1fr;
+}
+
+.discoveryGrid{
+grid-template-columns:repeat(2,1fr);
+}
+
+.building{
+width:10%;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ================================
+INTRO
+================================ -->
+
+<div id="intro">
+
+<div class="introPulse"></div>
+
+<div class="introTitle">PULSE</div>
+
+<div class="introText" id="introText">
+CONNECTION WAITING
+</div>
+
+<button class="enter" onclick="enterPulse()">
+CONNECT
+</button>
+
+</div>
+
+
+<!-- ================================
+WORLD
+================================ -->
+
+<div id="world">
+
+<div class="noise"></div>
+
+<header>
+
+<div class="logo">PULSE</div>
+
+<div class="headerRight">
+
+<span class="live">● LIVE</span>
+
+<span id="people">
+38 CONNECTED
+</span>
+
+<span id="clock">
+00:00:00
+</span>
+
+</div>
+
+</header>
+
+
+<nav>
+
+<button class="active" onclick="home(this)">
+HOME
+</button>
+
+<button onclick="openWindow('phone',this)">
+PHONE
+</button>
+
+<button onclick="openWindow('map',this)">
+MAP
+</button>
+
+<button onclick="openWindow('radio',this)">
+SIGNAL
+</button>
+
+<button onclick="openWindow('browser',this)">
+BROWSER
+</button>
+
+<button onclick="openWindow('files',this)">
+FILES
+</button>
+
+<button onclick="openWindow('music',this)">
+MUSIC
+</button>
+
+<button onclick="openWindow('identity',this)">
+ID
+</button>
+
+<button onclick="openWindow('discoveries',this)">
+FOUND
+</button>
+
+<button onclick="openWindow('outside',this)">
+PORTALS
+</button>
+
+<button onclick="openWindow('notes',this)">
+NOTES
+</button>
+
+</nav>
+
+
+<!-- CITY -->
+
+<div class="city">
+
+<div class="sky"></div>
+
+<div id="rain"></div>
+
+<div class="skyline" id="skyline">
+
+<div class="building" onclick="building(1)">
+<div class="windows"></div>
+</div>
+
+<div class="building" onclick="building(2)">
+<div class="windows"></div>
+</div>
+
+<div class="building" onclick="building(3)">
+<div class="windows"></div>
+</div>
+
+<div class="building" onclick="building(4)">
+<div class="windows"></div>
+</div>
+
+<div class="building" onclick="building(5)">
+<div class="windows"></div>
+</div>
+
+<div class="building" onclick="building(6)">
+<div class="windows"></div>
+</div>
+
+<div class="building" onclick="building(7)">
+<div class="windows"></div>
+</div>
+
+<div class="building" onclick="building(8)">
+<div class="windows"></div>
+</div>
+
+<div class="building" onclick="building(9)">
+<div class="windows"></div>
+</div>
+
+</div>
+
+<div class="street"></div>
+
+<div class="streetLight" style="left:20%"></div>
+<div class="streetLight" style="left:43%"></div>
+<div class="streetLight" style="left:65%"></div>
+<div class="streetLight" style="left:81%"></div>
+
+</div>
+
+
+<div class="info">
+
+<div>
+TIME:
+<strong id="worldTime">--:--</strong>
+</div>
+
+<div>
+WEATHER:
+<strong id="weather">CLEAR</strong>
+</div>
+
+<div>
+TEMP:
+<strong id="temperature">16°C</strong>
+</div>
+
+<div>
+SUN:
+<strong id="sun">NIGHT</strong>
+</div>
+
+<div>
+PULSE ID:
+<strong id="shortID">------</strong>
+</div>
+
+<div>
+VISITS:
+<strong id="visitCount">01</strong>
+</div>
+
+<div>
+FOUND:
+<strong id="foundCount">0 / 17</strong>
+</div>
+
+<div id="event">
+signal stable.
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ================================
+PHONE
+================================ -->
+
+<div class="window" id="phone">
+
+<div class="windowHeader">
+PULSE PHONE
+<span class="close" onclick="closeWindow('phone')">×</span>
+</div>
+
+<div class="windowBody">
+
+<div class="phoneGrid">
+
+<div class="app" onclick="phone('feed')">
+<div class="icon">◉</div>
+<span>FEED</span>
+</div>
+
+<div class="app" onclick="phone('messages')">
+<div class="icon">//</div>
+<span>MESSAGES</span>
+</div>
+
+<div class="app" onclick="phone('signal')">
+<div class="icon">⌁</div>
+<span>SIGNAL</span>
+</div>
+
+<div class="app" onclick="phone('camera')">
+<div class="icon">□</div>
+<span>CAMERA</span>
+</div>
+
+<div class="app" onclick="phone('weather')">
+<div class="icon">○</div>
+<span>WEATHER</span>
+</div>
+
+<div class="app" onclick="phone('system')">
+<div class="icon">01</div>
+<span>SYSTEM</span>
+</div>
+
+</div>
+
+<div id="phoneContent"></div>
+
+</div>
+</div>
+
+
+<!-- ================================
+MAP
+================================ -->
+
+<div class="window" id="map">
+
+<div class="windowHeader">
+CITY MAP
+<span class="close" onclick="closeWindow('map')">×</span>
+</div>
+
+<div class="windowBody">
+
+<p style="font-size:8px;color:var(--muted);letter-spacing:.18em">
+MAP DATA MAY BE INCORRECT.
+</p>
+
+<div class="map">
+
+<div class="mapPoint"
+style="left:17%;top:22%"
+onclick="discover('SHIBUYA')">
+<span>SHIBUYA</span>
+</div>
+
+<div class="mapPoint"
+style="left:61%;top:18%"
+onclick="discover('SHINJUKU')">
+<span>SHINJUKU</span>
+</div>
+
+<div class="mapPoint"
+style="left:42%;top:53%"
+onclick="discover('HARAJUKU')">
+<span>HARAJUKU</span>
+</div>
+
+<div class="mapPoint"
+style="left:76%;top:68%"
+onclick="discover('STATION 0')">
+<span>STATION_0</span>
+</div>
+
+<div class="mapPoint"
+style="left:26%;top:76%"
+onclick="discover('ROOM 03')">
+<span>ROOM_03</span>
+</div>
+
+<div class="mapPoint"
+style="left:86%;top:36%"
+onclick="discover('UNKNOWN')">
+<span>???</span>
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- ================================
+SIGNAL
+================================ -->
+
+<div class="window" id="radio">
+
+<div class="windowHeader">
+PULSE SIGNAL
+<span class="close" onclick="closeWindow('radio')">×</span>
+</div>
+
+<div class="windowBody">
+
+<div class="frequency" id="frequency">
+88.7
+</div>
+
+<div style="font-size:8px;color:var(--muted)">
+LOCAL TRANSMISSION
+</div>
+
+<div class="radioBar"></div>
+
+<div class="radioMessage" id="radioMessage">
+NO SIGNAL.
+<br><br>
+SCAN THE FREQUENCY.
+</div>
+
+<div class="actions">
+
+<button class="action" onclick="scan()">
+SCAN
+</button>
+
+<button class="action" onclick="listen()">
+LISTEN
+</button>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- ================================
+BROWSER
+================================ -->
+
+<div class="window" id="browser">
+
+<div class="windowHeader">
+PULSE BROWSER
+<span class="close" onclick="closeWindow('browser')">×</span>
+</div>
+
+<div class="windowBody">
+
+<div class="browserBar">
+
+<input
+class="browserInput"
+id="browserInput"
+placeholder="search..."
+>
+
+<button class="action" onclick="searchPulse()">
+SEARCH
+</button>
+
+</div>
+
+<div class="browserPage" id="browserPage">
+
+<h1>PULSE</h1>
+
+the internet remembers things.
+
+<br><br>
+
+try searching:
+
+02:17
+
+WHO
+
+CITY
+
+PULSE
+
+ROOM 03
+
+</div>
+
+</div>
+</div>
+
+
+<!-- ================================
+FILES
+================================ -->
+
+<div class="window" id="files">
+
+<div class="windowHeader">
+FILESYSTEM
+<span class="close" onclick="closeWindow('files')">×</span>
+</div>
+
+<div class="windowBody">
+
+<div class="files">
+
+<div>/PULSE</div>
+
+<div class="folder" onclick="folder('SYSTEM')">
+└── /SYSTEM
+</div>
+
+<div class="folder" onclick="folder('MEDIA')">
+└── /MEDIA
+</div>
+
+<div class="folder" onclick="folder('UNKNOWN')">
+└── /UNKNOWN
+</div>
+
+<div class="folder" onclick="folder('USER')">
+└── /USER
+</div>
+
+<div class="folder" onclick="folder('ARCHIVE')">
+└── /ARCHIVE
+</div>
+
+<br>
+
+<div class="file" onclick="file('0217_SYSTEM.log')">
+0217_SYSTEM.log
+</div>
+
+<div class="file" onclick="file('CITY_MAP.dat')">
+CITY_MAP.dat
+</div>
+
+<div class="file" onclick="file('UNKNOWN.jpg')">
+UNKNOWN.jpg
+</div>
+
+<div class="file" onclick="file('ROOM_03.txt')">
+ROOM_03.txt
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- ================================
+MUSIC
+================================ -->
+
+<div class="window" id="music">
+
+<div class="windowHeader">
+PULSE MUSIC SIGNAL
+<span class="close" onclick="closeWindow('music')">×</span>
+</div>
+
+<div class="windowBody">
+
+<p style="font-size:8px;color:var(--muted);letter-spacing:.16em">
+EXTERNAL TRANSMISSIONS / MUSIC
+</p>
+
+<div class="musicGrid">
+
+<a
+class="musicCard"
+href="https://cultmembr.bandcamp.com/"
+target="_blank"
+rel="noopener"
+onclick="discover('CULT MEMBER')"
+>
+
+<div class="musicNumber">SIGNAL_01</div>
+
+<div class="musicName">
+CULT MEMBER
+</div>
+
+<div class="musicStatus">
+OPEN TRANSMISSION →
+</div>
+
+</a>
+
+
+<a
+class="musicCard"
+href="https://music.apple.com/us/artist/%24undown/1639973298"
+target="_blank"
+rel="noopener"
+onclick="discover('$uNDOWN')"
+>
+
+<div class="musicNumber">SIGNAL_02</div>
+
+<div class="musicName">
+$uNDOWN
+</div>
+
+<div class="musicStatus">
+OPEN TRANSMISSION →
+</div>
+
+</a>
+
+
+<a
+class="musicCard"
+href="https://music.apple.com/us/artist/faye-wong/55445"
+target="_blank"
+rel="noopener"
+onclick="discover('FAYE WONG')"
+>
+
+<div class="musicNumber">SIGNAL_03</div>
+
+<div class="musicName">
+FAYE WONG
+</div>
+
+<div class="musicStatus">
+OPEN TRANSMISSION →
+</div>
+
+</a>
+
+
+<a
+class="musicCard"
+href="https://cultmembr.bandcamp.com/music"
+target="_blank"
+rel="noopener"
+onclick="discover('LOW LIFE')"
+>
+
+<div class="musicNumber">SIGNAL_04</div>
+
+<div class="musicName">
+LOW LIFE
+</div>
+
+<div class="musicStatus">
+CULT MEMBER / ALBUM SIGNAL →
+</div>
+
+</a>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- ================================
+IDENTITY
+================================ -->
+
+<div class="window" id="identity">
+
+<div class="windowHeader">
+PULSE IDENTITY
+<span class="close" onclick="closeWindow('identity')">×</span>
+</div>
+
+<div class="windowBody">
+
+<div class="identity">
+
+PULSE_ID:
+<div class="identityValue" id="fullID"></div>
+
+VISITS:
+<div class="identityValue" id="idVisits"></div>
+
+DISCOVERIES:
+<div class="identityValue" id="idDiscoveries"></div>
+
+TIME INSIDE:
+<div class="identityValue" id="timeInside">
+00:00:00
+</div>
+
+STATUS:
+<div class="identityValue">
+UNVERIFIED
+</div>
+
+CONNECTION:
+<div class="identityValue">
+ACTIVE
+</div>
+
+</div>
+
+<br>
+
+<p style="font-size:8px;color:var(--muted)">
+THIS ID IS STORED LOCALLY.
+</p>
+
+</div>
+</div>
+
+
+<!-- ================================
+DISCOVERIES
+================================ -->
+
+<div class="window" id="discoveries">
+
+<div class="windowHeader">
+DISCOVERIES
+<span class="close" onclick="closeWindow('discoveries')">×</span>
+</div>
+
+<div class="windowBody">
+
+<p style="font-size:8px;color:var(--muted)">
+NOT EVERYTHING HERE IS REAL.
+</p>
+
+<div class="discoveryGrid" id="discoveryGrid"></div>
+
+</div>
+</div>
+
+
+<!-- ================================
+PORTALS
+================================ -->
+
+<div class="window" id="outside">
+
+<div class="windowHeader">
+EXTERNAL PORTALS
+<span class="close" onclick="closeWindow('outside')">×</span>
+</div>
+
+<div class="windowBody">
+
+<div class="portalGrid">
+
+<a
+class="portal"
+href="https://123co84.github.io/solitude-fashion/"
+target="_blank"
+rel="noopener"
+onclick="discover('SOLITUDE')"
+>
+
+<small>DOOR_01</small>
+
+<h2>SOLITUDE</h2>
+
+<p>
+CONNECTION FOUND.
+</p>
+
+</a>
+
+
+<a
+class="portal"
+href="https://123co84.github.io/TANG--og/"
+target="_blank"
+rel="noopener"
+onclick="discover('TANG')"
+>
+
+<small>DOOR_02</small>
+
+<h2>TANG</h2>
+
+<p>
+SIGNAL ACTIVE.
+</p>
+
+</a>
+
+
+<a
+class="portal"
+href="https://123co84.github.io/CYRAremake/"
+target="_blank"
+rel="noopener"
+onclick="discover('CYRA')"
+>
+
+<small>DOOR_03</small>
+
+<h2>CYRA</h2>
+
+<p>
+UNKNOWN DESTINATION.
+</p>
+
+</a>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- ================================
+NOTES
+================================ -->
+
+<div class="window" id="notes">
+
+<div class="windowHeader">
+LOCAL NOTES
+<span class="close" onclick="closeWindow('notes')">×</span>
+</div>
+
+<div class="windowBody">
+
+<textarea
+class="notes"
+id="notesArea"
+placeholder="write something..."
+></textarea>
+
+<br><br>
+
+<button class="action" onclick="saveNotes()">
+SAVE
+</button>
+
+</div>
+</div>
+
+
+<!-- ================================
+SECRET
+================================ -->
+
+<div id="secret">
+
+<div class="secretBox">
+
+<h1 id="secretTitle">
+02:17
+</h1>
+
+<p id="secretText">
+YOU FOUND SOMETHING THAT WAS NOT SUPPOSED TO EXIST.
+</p>
+
+<button
+class="secretClose"
+onclick="closeSecret()"
+>
+RETURN
+</button>
+
+</div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script>
+
+/* =====================================
+MEMORY
+===================================== */
+
+let memory=JSON.parse(
+localStorage.getItem("PULSE_MEMORY") ||
+'{"id":"","visits":0,"discoveries":[],"time":0,"buildings":[]}'
+);
+
+if(!memory.id){
+
+memory.id=
+"PULSE_"+Math.random()
+.toString(36)
+.substring(2,8)
+.toUpperCase();
+
+}
+
+memory.visits++;
+
+localStorage.setItem(
+"PULSE_MEMORY",
+JSON.stringify(memory)
+);
+
+document.getElementById("shortID").textContent=
+memory.id.replace("PULSE_","");
+
+document.getElementById("fullID").textContent=
+memory.id;
+
+document.getElementById("visitCount").textContent=
+String(memory.visits).padStart(2,"0");
+
+document.getElementById("idVisits").textContent=
+memory.visits;
+
+document.getElementById("introText").textContent=
+memory.visits>1
+? "YOU CAME BACK."
+: "CONNECTION WAITING";
+
+
+/* =====================================
+ENTER
+===================================== */
+
+function enterPulse(){
+
+document.getElementById("intro")
+.classList.add("hide");
+
+setTimeout(()=>{
+document.getElementById("intro").style.display="none";
+},1200);
+
+}
+
+
+/* =====================================
+CLOCK
+===================================== */
+
+function updateClock(){
+
+const now=new Date();
+
+let h=String(now.getHours()).padStart(2,"0");
+let m=String(now.getMinutes()).padStart(2,"0");
+let s=String(now.getSeconds()).padStart(2,"0");
+
+document.getElementById("clock").textContent=
+`${h}:${m}:${s}`;
+
+document.getElementById("worldTime").textContent=
+`${h}:${m}`;
+
+let sun="NIGHT";
+
+if(now.getHours()>=6 && now.getHours()<9)
+sun="SUNRISE";
+
+if(now.getHours()>=9 && now.getHours()<18)
+sun="DAY";
+
+if(now.getHours()>=18 && now.getHours()<21)
+sun="SUNSET";
+
+document.getElementById("sun").textContent=sun;
+
+
+/* 02:17 */
+
+if(h==="02" && m==="17"){
+
+document.getElementById("event").textContent=
+"02:17 IS HERE.";
+
+discover("02:17");
+
+}
+
+}
+
+setInterval(updateClock,1000);
+updateClock();
+
+
+/* =====================================
+TIME INSIDE
+===================================== */
+
+setInterval(()=>{
+
+memory.time++;
+
+document.getElementById("timeInside").textContent=
+formatTime(memory.time);
+
+localStorage.setItem(
+"PULSE_MEMORY",
+JSON.stringify(memory)
+);
+
+},1000);
+
+function formatTime(seconds){
+
+let h=Math.floor(seconds/3600);
+
+let m=Math.floor((seconds%3600)/60);
+
+let s=seconds%60;
+
+return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+
+}
+
+
+/* =====================================
+MOUSE CITY
+===================================== */
+
+document.addEventListener("mousemove",e=>{
+
+let x=(e.clientX/window.innerWidth-.5)*-22;
+
+let y=(e.clientY/window.innerHeight-.5)*-12;
+
+document
+.getElementById("skyline")
+.style.setProperty(
+"--cityX",
+`${x}px`
+);
+
+document
+.getElementById("skyline")
+.style.setProperty(
+"--cityY",
+`${y}px`
+);
+
+});
+
+
+/* =====================================
+WEATHER
+===================================== */
+
+const weather=[
+"CLEAR",
+"FOG",
+"RAIN",
+"HAZE",
+"OVERCAST"
+];
+
+function changeWeather(){
+
+let state=
+weather[
+Math.floor(Math.random()*weather.length)
+];
+
+document.getElementById("weather")
+.textContent=state;
+
+document.getElementById("rain")
+.classList.remove("active");
+
+document.getElementById("world")
+.classList.remove("fog");
+
+if(state==="RAIN")
+document.getElementById("rain")
+.classList.add("active");
+
+if(state==="FOG")
+document.getElementById("world")
+.classList.add("fog");
+
+}
+
+setInterval(changeWeather,40000);
+
+
+/* =====================================
+RANDOM EVENTS
+===================================== */
+
+const events=[
+
+"signal stable.",
+"someone entered the city.",
+"the fourth building moved.",
+"unknown connection detected.",
+"there are lights on floor 17.",
+"the map is inaccurate.",
+"someone is watching the signal.",
+"the station is open.",
+"you were not supposed to find this.",
+"everything is normal.",
+"everything is not normal.",
+"pulse detected.",
+"someone remembers you.",
+"connection unstable.",
+"something changed."
+
+];
+
+setInterval(()=>{
+
+document.getElementById("event")
+.textContent=
+events[
+Math.floor(Math.random()*events.length)
+];
+
+},7000);
+
+
+/* =====================================
+PEOPLE
+===================================== */
+
+setInterval(()=>{
+
+document.getElementById("people")
+.textContent=
+`${Math.floor(25+Math.random()*70)} CONNECTED`;
+
+},5000);
+
+
+/* =====================================
+WINDOWS
+===================================== */
+
+let z=700;
+
+function openWindow(id,button){
+
+const win=document.getElementById(id);
+
+win.classList.add("open");
+
+win.style.zIndex=++z;
+
+if(button){
+
+document
+.querySelectorAll("nav button")
+.forEach(b=>b.classList.remove("active"));
+
+button.classList.add("active");
+
+}
+
+}
+
+function closeWindow(id){
+
+document
+.getElementById(id)
+.classList.remove("open");
+
+}
+
+function home(button){
+
+document
+.querySelectorAll(".window")
+.forEach(w=>w.classList.remove("open"));
+
+document
+.querySelectorAll("nav button")
+.forEach(b=>b.classList.remove("active"));
+
+button.classList.add("active");
+
+}
+
+
+/* =====================================
+DRAGGABLE WINDOWS
+===================================== */
+
+document
+.querySelectorAll(".window")
+.forEach(win=>{
+
+let dragging=false;
+let offsetX=0;
+let offsetY=0;
+
+const header=
+win.querySelector(".windowHeader");
+
+header.addEventListener(
+"mousedown",
+e=>{
+
+dragging=true;
+
+const rect=
+win.getBoundingClientRect();
+
+offsetX=e.clientX-rect.left;
+offsetY=e.clientY-rect.top;
+
+win.style.transform="none";
+
+win.style.left=
+`${rect.left}px`;
+
+win.style.top=
+`${rect.top}px`;
+
+win.style.zIndex=++z;
+
+}
+);
+
+document.addEventListener(
+"mousemove",
+e=>{
+
+if(!dragging)return;
+
+win.style.left=
+`${e.clientX-offsetX}px`;
+
+win.style.top=
+`${e.clientY-offsetY}px`;
+
+}
+);
+
+document.addEventListener(
+"mouseup",
+()=>{
+dragging=false;
+}
+);
+
+});
+
+
+/* =====================================
+PHONE
+===================================== */
+
+function phone(type){
+
+const box=
+document.getElementById("phoneContent");
+
+if(type==="feed"){
+
+box.innerHTML=`
+
+<div class="feed">
+
+<div class="post">
+
+<div class="postHeader">
+PULSE / 02:11
+</div>
+
+<div class="fakeImage"></div>
+
+<div class="postText">
+someone uploaded this at 02:11.
+<br><br>
+nobody knows where it was taken.
+</div>
+
+</div>
+
+<br>
+
+<div class="post">
+
+<div class="postHeader">
+UNKNOWN / 02:14
+</div>
+
+<div class="postText">
+the station is open tonight.
+</div>
+
+</div>
+
+</div>
+
+`;
+
+discover("PHONE FEED");
+
+}
+
+
+if(type==="messages"){
+
+box.innerHTML=`
+
+<div class="feed">
+
+<div class="post">
+<div class="postHeader">UNKNOWN</div>
+<div class="postText">
+are you still there?
+</div>
+</div>
+
+<div class="post">
+<div class="postHeader">UNKNOWN</div>
+<div class="postText">
+don't answer this.
+</div>
+</div>
+
+<div class="post">
+<div class="postHeader">UNKNOWN</div>
+<div class="postText">
+you already answered.
+</div>
+</div>
+
+</div>
+
+`;
+
+discover("MESSAGES");
+
+}
+
+
+if(type==="signal"){
+
+box.innerHTML=`
+
+<div style="text-align:center;padding:35px">
+
+<div style="
+font-size:55px;
+color:var(--red);
+">
+⌁
+</div>
+
+<br>
+
+SIGNAL STRENGTH
+
+<h2 style="
+font-weight:300;
+font-size:40px;
+">
+${Math.floor(Math.random()*100)}%
+</h2>
+
+</div>
+
+`;
+
+}
+
+
+if(type==="camera"){
+
+box.innerHTML=`
+
+<div style="text-align:center">
+
+<div style="
+height:200px;
+border:1px solid var(--line);
+display:grid;
+place-items:center;
+color:var(--muted);
+">
+CAMERA READY
+</div>
+
+<br>
+
+<button class="action"
+onclick="cameraScan()">
+SCAN
+</button>
+
+</div>
+
+`;
+
+}
+
+
+if(type==="weather"){
+
+box.innerHTML=`
+
+<div style="padding:20px">
+
+CURRENT WEATHER
+
+<h1 style="
+font-size:50px;
+font-weight:200;
+">
+${document.getElementById("weather").textContent}
+</h1>
+
+TEMPERATURE
+
+<h2 style="font-weight:300">
+${document.getElementById("temperature").textContent}
+</h2>
+
+</div>
+
+`;
+
+}
+
+
+if(type==="system"){
+
+box.innerHTML=`
+
+<div class="identity">
+
+SYSTEM STATUS
+
+<br><br>
+
+PULSE:
+<span class="identityValue">
+ACTIVE
+</span>
+
+<br>
+
+MEMORY:
+<span class="identityValue">
+${memory.visits} VISITS
+</span>
+
+<br>
+
+SIGNAL:
+<span class="identityValue">
+CONNECTED
+</span>
+
+<br>
+
+ERRORS:
+<span class="identityValue">
+${Math.floor(Math.random()*9)}
+</span>
+
+</div>
+
+`;
+
+}
+
+}
+
+
+/* =====================================
+DISCOVERIES
+===================================== */
+
+const allDiscoveries=[
+
+"FIRST CONNECTION",
+"PHONE FEED",
+"MESSAGES",
+"RADIO",
+"SHIBUYA",
+"SHINJUKU",
+"HARAJUKU",
+"STATION 0",
+"ROOM 03",
+"UNKNOWN",
+"CULT MEMBER",
+"$uNDOWN",
+"FAYE WONG",
+"02:17",
+"BUILDING 4",
+"BUILDING 8",
+"HIDDEN CODE"
+
+];
+
+function discover(name){
+
+if(!memory.discoveries.includes(name)){
+
+memory.discoveries.push(name);
+
+localStorage.setItem(
+"PULSE_MEMORY",
+JSON.stringify(memory)
+);
+
+showToast(
+"DISCOVERY: "+name
+);
+
+}
+
+updateDiscoveries();
+
+}
+
+function updateDiscoveries(){
+
+document.getElementById("foundCount")
+.textContent=
+`${memory.discoveries.length} / 17`;
+
+document.getElementById("idDiscoveries")
+.textContent=
+memory.discoveries.length;
+
+const grid=
+document.getElementById("discoveryGrid");
+
+grid.innerHTML="";
+
+allDiscoveries.forEach(item=>{
+
+const div=
+document.createElement("div");
+
+div.className=
+"discovery "+
+(
+memory.discoveries.includes(item)
+? "found"
+: ""
+);
+
+div.textContent=
+memory.discoveries.includes(item)
+? item
+: "UNKNOWN";
+
+grid.appendChild(div);
+
+});
+
+}
+
+
+/* =====================================
+BUILDINGS
+===================================== */
+
+function building(number){
+
+if(!memory.buildings.includes(number)){
+
+memory.buildings.push(number);
+
+discover(
+"BUILDING "+number
+);
+
+localStorage.setItem(
+"PULSE_MEMORY",
+JSON.stringify(memory)
+);
+
+}
+
+const buildings=
+document.querySelectorAll(".building");
+
+buildings[number-1]
+.classList.add("glitchBuilding");
+
+setTimeout(()=>{
+buildings[number-1]
+.classList.remove("glitchBuilding");
+},900);
+
+
+if(number===4){
+
+document.getElementById("secretTitle")
+.textContent="BUILDING 04";
+
+document.getElementById("secretText")
+.textContent=
+"YOU LOOKED AT IT. IT LOOKED BACK.";
+
+document.getElementById("secret")
+.classList.add("show");
+
+}
+
+if(number===8){
+
+document.getElementById("event")
+.textContent=
+"THE EIGHTH BUILDING ISN'T THERE ANYMORE.";
+
+}
+
+}
+
+
+/* =====================================
+RADIO
+===================================== */
+
+const frequencies=[
+"88.7",
+"91.3",
+"94.2",
+"97.1",
+"101.7",
+"104.6",
+"107.2",
+"021.7"
+];
+
+const transmissions=[
+
+"nothing but static.",
+
+"someone is speaking very quietly.",
+
+"this station was closed years ago.",
+
+"you are listening at the wrong time.",
+
+"signal moving.",
+
+"do not answer.",
+
+"there is someone outside.",
+
+"we can see the city.",
+
+"02:17 is not a time.",
+
+"connection accepted.",
+
+"stop scanning."
+
+];
+
+function scan(){
+
+let f=
+frequencies[
+Math.floor(Math.random()*frequencies.length)
+];
+
+document.getElementById("frequency")
+.textContent=f;
+
+discover("RADIO");
+
+if(f==="021.7"){
+
+document.getElementById("radioMessage")
+.textContent=
+"YOU FOUND THE FREQUENCY THAT DOESN'T EXIST.";
+
+discover("HIDDEN FREQUENCY");
+
+}
+
+}
+
+function listen(){
+
+document.getElementById("radioMessage")
+.textContent=
+transmissions[
+Math.floor(Math.random()*transmissions.length)
+];
+
+}
+
+
+/* =====================================
+BROWSER
+===================================== */
+
+function searchPulse(){
+
+let query=
+document
+.getElementById("browserInput")
+.value
+.trim()
+.toLowerCase();
+
+const page=
+document.getElementById("browserPage");
+
+const results={
+
+"pulse":
+"<h1>PULSE</h1>you are already connected.",
+
+"02:17":
+"<h1>02:17</h1>the time between being awake and dreaming.",
+
+"who":
+"<h1>WHO</h1>no match found.",
+
+"city":
+"<h1>CITY</h1>you already know where you are.",
+
+"room 03":
+"<h1>ROOM 03</h1>someone left the light on.",
+
+"hello":
+"<h1>HELLO</h1>hello.",
+
+"help":
+"<h1>HELP</h1>try looking behind you.",
+
+"nothing":
+"<h1>NOTHING</h1>incorrect."
+
+};
+
+page.innerHTML=
+results[query] ||
+"<h1>NO RESULTS</h1>the system has no record of this.";
+
+discover("SEARCH: "+query);
+
+}
+
+
+/* =====================================
+FILES
+===================================== */
+
+function folder(name){
+
+discover("FOLDER: "+name);
+
+showToast(
+"/"+name+" OPENED"
+);
+
+}
+
+function file(name){
+
+discover("FILE: "+name);
+
+let messages={
+
+"0217_SYSTEM.log":
+"02:17 — SYSTEM EVENT — DO NOT REPEAT",
+
+"CITY_MAP.dat":
+"MAP ERROR: 3 LOCATIONS UNRESOLVED",
+
+"UNKNOWN.jpg":
+"IMAGE CORRUPTED",
+
+"ROOM_03.txt":
+"ROOM 03 IS OCCUPIED."
+
+};
+
+document.getElementById("secretText")
+.textContent=
+messages[name] ||
+"FILE CONTENT UNKNOWN.";
+
+document.getElementById("secret")
+.classList.add("show");
+
+}
+
+
+/* =====================================
+CAMERA
+===================================== */
+
+function cameraScan(){
+
+discover("CAMERA");
+
+showToast(
+"SCAN STORED LOCALLY."
+);
+
+}
+
+
+/* =====================================
+NOTES
+===================================== */
+
+const notes=
+document.getElementById("notesArea");
+
+notes.value=
+localStorage.getItem("PULSE_NOTES") || "";
+
+function saveNotes(){
+
+localStorage.setItem(
+"PULSE_NOTES",
+notes.value
+);
+
+discover("NOTES");
+
+showToast(
+"NOTES SAVED LOCALLY."
+);
+
+}
+
+
+/* =====================================
+TEMPERATURE
+===================================== */
+
+setInterval(()=>{
+
+let temp=
+Math.floor(9+Math.random()*15);
+
+document.getElementById("temperature")
+.textContent=
+`${temp}°C`;
+
+},15000);
+
+
+/* =====================================
+RANDOM GLITCH
+===================================== */
+
+function randomGlitch(){
+
+if(Math.random()<.6){
+
+document.body.classList.add("glitch");
+
+setTimeout(()=>{
+document.body.classList.remove("glitch");
+},350);
+
+}
+
+if(Math.random()<.3){
+
+let buildings=
+document.querySelectorAll(".building");
+
+let random=
+buildings[
+Math.floor(Math.random()*buildings.length)
+];
+
+random.classList.add("glitchBuilding");
+
+setTimeout(()=>{
+random.classList.remove("glitchBuilding");
+},700);
+
+}
+
+}
+
+setInterval(
+randomGlitch,
+18000
+);
+
+
+/* =====================================
+STRANGE UI CHANGES
+===================================== */
+
+setInterval(()=>{
+
+if(Math.random()<.25){
+
+const event=
+document.getElementById("event");
+
+event.textContent=
+[
+"you stayed too long.",
+"connection noticed.",
+"why did you come back?",
+"someone changed this.",
+"this wasn't here before.",
+"pulse is learning.",
+"do not refresh.",
+"refreshing will not help."
+][
+Math.floor(Math.random()*8)
+];
+
+}
+
+},12000);
+
+
+/* =====================================
+SECRET KEY
+===================================== */
+
+let keys=[];
+
+document.addEventListener(
+"keydown",
+e=>{
+
+keys.push(e.key.toLowerCase());
+
+if(keys.length>12)
+keys.shift();
+
+if(keys.join("")==="pulse0217"){
+
+discover("HIDDEN CODE");
+
+document.getElementById("secretTitle")
+.textContent="PULSE";
+
+document.getElementById("secretText")
+.textContent=
+"YOU FOUND THE BACKDOOR.";
+
+document.getElementById("secret")
+.classList.add("show");
+
+keys=[];
+
+}
+
+}
+);
+
+
+/* =====================================
+03:03 EVENT
+===================================== */
+
+setInterval(()=>{
+
+const now=new Date();
+
+if(
+now.getHours()===3 &&
+now.getMinutes()===3 &&
+now.getSeconds()===3
+){
+
+document.getElementById("world")
+.classList.add("red");
+
+document.getElementById("secretTitle")
+.textContent="03:03";
+
+document.getElementById("secretText")
+.textContent=
+"THIS WASN'T SUPPOSED TO HAPPEN.";
+
+document.getElementById("secret")
+.classList.add("show");
+
+discover("03:03");
+
+setTimeout(()=>{
+document.getElementById("world")
+.classList.remove("red");
+},5000);
+
+}
+
+},1000);
+
+
+/* =====================================
+RETURN VISITOR
+===================================== */
+
+if(memory.visits>=3){
+
+setTimeout(()=>{
+
+showToast(
+"YOU HAVE BEEN HERE "+memory.visits+" TIMES."
+);
+
+},5000);
+
+}
+
+if(memory.visits>=5){
+
+setTimeout(()=>{
+
+document.getElementById("event")
+.textContent=
+"PULSE REMEMBERS YOU.";
+
+},8000);
+
+}
+
+
+/* =====================================
+INITIALIZE
+===================================== */
+
+discover("FIRST CONNECTION");
+
+updateDiscoveries();
+
+</script>
+
+</body>
+</html>
+```
